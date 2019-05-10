@@ -1,5 +1,5 @@
 import handlers.TimeClientHandler;
-import handlers.TimeServerHandler;
+import handlers.TimeDecoderHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -11,13 +11,17 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lib.FromRFC868TimeStampConverter;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class NettyTimeClient {
 
     private String host;
     private int port;
-    ChannelInboundHandlerAdapter timeHandler;
+    List<ChannelInboundHandlerAdapter> handlerList;
 
     public NettyTimeClient() {
+        handlerList = new LinkedList<>();
     }
 
     public NettyTimeClient host(String host) {
@@ -30,8 +34,8 @@ public class NettyTimeClient {
         return this;
     }
 
-    public NettyTimeClient timeHandler(ChannelInboundHandlerAdapter timeHandler) {
-        this.timeHandler = timeHandler;
+    public NettyTimeClient withHandler(ChannelInboundHandlerAdapter timeHandler) {
+        handlerList.add(timeHandler);
         return this;
     }
 
@@ -53,7 +57,7 @@ public class NettyTimeClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(timeHandler);
+                            ch.pipeline().addLast(allHandlers());
                         }
                     });
 
@@ -65,11 +69,16 @@ public class NettyTimeClient {
         }
     }
 
+    private ChannelInboundHandlerAdapter[] allHandlers() {
+        return handlerList.toArray(new ChannelInboundHandlerAdapter[0]);
+    }
+
     public static void main(String[] args) throws Exception {
         new NettyTimeClient()
                 .host("localhost")
                 .port(8080)
-                .timeHandler(new TimeClientHandler(new FromRFC868TimeStampConverter()))
+                .withHandler(new TimeDecoderHandler())
+                .withHandler(new TimeClientHandler(new FromRFC868TimeStampConverter()))
                 .connect();
     }
 }

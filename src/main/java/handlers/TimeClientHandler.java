@@ -6,8 +6,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lib.TimeStampConverter;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class TimeClientHandler extends ChannelInboundHandlerAdapter {
 
