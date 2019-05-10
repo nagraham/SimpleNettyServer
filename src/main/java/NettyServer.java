@@ -10,6 +10,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lib.ToRFC868TimeStampConverter;
 
 public class NettyServer {
     private static int DEFAULT_PORT = 8080;
@@ -53,7 +54,7 @@ public class NettyServer {
     }
 
     static NettyServer timeServer(int port) {
-        return new NettyServer(port, createChannelInitializer(new TimeServerHandler()));
+        return new NettyServer(port, createChannelInitializer(new TimeServerHandler(new ToRFC868TimeStampConverter())));
     }
 
     private static ChannelInitializer<SocketChannel> createChannelInitializer(ChannelInboundHandlerAdapter handler) {
