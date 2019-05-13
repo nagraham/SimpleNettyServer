@@ -1,16 +1,16 @@
 import handlers.DiscardServerHandler;
 import handlers.EchoServerHandler;
+import handlers.TimeEncoderHandler;
 import handlers.TimeServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import lib.ToRFC868TimeStampConverter;
 
 public class NettyServer {
     private static int DEFAULT_PORT = 8080;
@@ -54,14 +54,14 @@ public class NettyServer {
     }
 
     static NettyServer timeServer(int port) {
-        return new NettyServer(port, createChannelInitializer(new TimeServerHandler(new ToRFC868TimeStampConverter())));
+        return new NettyServer(port, createChannelInitializer(new TimeEncoderHandler(), new TimeServerHandler()));
     }
 
-    private static ChannelInitializer<SocketChannel> createChannelInitializer(ChannelInboundHandlerAdapter handler) {
+    private static ChannelInitializer<SocketChannel> createChannelInitializer(ChannelHandler... handlers) {
         return new ChannelInitializer<SocketChannel>() {
             @Override
-            public void initChannel(SocketChannel ch) throws Exception {
-                ch.pipeline().addLast(handler);
+            public void initChannel(SocketChannel ch) {
+                ch.pipeline().addLast(handlers);
             }
         };
     }

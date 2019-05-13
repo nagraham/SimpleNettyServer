@@ -9,7 +9,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import lib.FromRFC868TimeStampConverter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +77,7 @@ public class NettyTimeClient {
                 .host("localhost")
                 .port(8080)
                 .withHandler(new TimeDecoderHandler())
-                .withHandler(new TimeClientHandler(new FromRFC868TimeStampConverter()))
+                .withHandler(new TimeClientHandler())
                 .connect();
     }
 }

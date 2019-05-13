@@ -3,6 +3,7 @@ package handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lib.TimeStamp;
 
 import java.util.List;
 
@@ -16,6 +17,6 @@ public class TimeDecoderHandler extends ByteToMessageDecoder {
             return;
         }
 
-        out.add(in.readBytes(4));
+        out.add(TimeStamp.fromRFC868(in.readUnsignedInt()));
     }
 }
